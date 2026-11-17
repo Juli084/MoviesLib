@@ -1,35 +1,34 @@
-import { useEffect, useState } from "react";
-import MovieCard from "../components/MovieCard";
+import { useEffect, useState } from 'react';
+import MovieCard from '../components/MovieCard';
+import { consultar } from '../servicos/filmes';
 
-import "./MoviesGrid.css";
+import './MoviesGrid.css';
 
-const moviesURL = import.meta.env.VITE_API;
-const apiKey = import.meta.env.VITE_API_KEY;
-
-const Home = () => {
-  const [topMovies, setTopMovies] = useState([]);
-
-  const getTopRatedMovies = async (url) => {
-    const res = await fetch(url);
-    const data = await res.json();
-    setTopMovies(data.results);
-  };
+export default function Home() {
+  const [estado, setEstado] = useState({ tipo: 'carregando' });
 
   useEffect(() => {
-    const topRatedUrl = `${moviesURL}top_rated?${apiKey}`;
-    
-    getTopRatedMovies(topRatedUrl);
+    let ignorar = false;
+    consultar({ lista: 'melhores' }).then((proximo) => {
+      if (!ignorar) setEstado(proximo);
+    });
+    return () => {
+      ignorar = true;
+    };
   }, []);
 
   return (
     <div className="container">
-      <h2 className="title">Melhores filmes:</h2>
-      <div className="movies-container">
-        {topMovies.length > 0 &&
-          topMovies.map((movie) => <MovieCard key={movie.id} movie={movie} />)}
-      </div>
+      <h1 className="title">Melhores filmes</h1>
+      {estado.tipo === 'carregando' && <p role="status" className="mensagem">Carregando...</p>}
+      {estado.tipo === 'erro' && <p role="alert" className="mensagem">{estado.mensagem}</p>}
+      {estado.tipo === 'ok' && (
+        <div className="movies-container">
+          {estado.filmes.map((filme) => (
+            <MovieCard key={filme.id} movie={filme} />
+          ))}
+        </div>
+      )}
     </div>
   );
-};
-
-export default Home;
+}

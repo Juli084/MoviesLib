@@ -1,76 +1,63 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import {
-  BsGraphUp,
-  BsWallet2,
-  BsHourglassSplit,
-  BsFillFileEarmarkTextFill,
-} from "react-icons/bs";
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router';
+import { BsGraphUp, BsWallet2, BsHourglassSplit, BsFillFileEarmarkTextFill } from 'react-icons/bs';
+import MovieCard from '../components/MovieCard';
+import { consultar } from '../servicos/filmes';
 
-import MovieCard from "../components/MovieCard";
+import './Movie.css';
 
-import "./Movie.css";
+const dolar = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'USD' });
+const valor = (numero) => (numero > 0 ? dolar.format(numero) : 'Não informado');
 
-const moviesURL = import.meta.env.VITE_API;
-const apiKey = import.meta.env.VITE_API_KEY;
+export default function Movie() {
+  const { id } = useParams();
+  const [resultado, setResultado] = useState({ id: null });
 
-const Movie = () => {
-  const {id} = useParams();
-  const [movie, setMovie] = useState(null);
-
-  const getMovie = async (url) => {
-    const res = await fetch(url);
-    const data = await res.json();
-    console.log(data);
-    setMovie(data);
-  };
-
-  const formatCurrency = (number) => {
-    return number.toLocaleString("en-US", {
-      style: "currency",
-      currency: "USD",
-    });
-  };
-
+  // Depende do id: abrir outro filme recarrega os dados.
   useEffect(() => {
-    const movieUrl = `${moviesURL}${id}?${apiKey}`;
-    getMovie(movieUrl);
-  }, []);
+    let ignorar = false;
+    consultar({ id }).then((proximo) => {
+      if (!ignorar) setResultado({ id, ...proximo });
+    });
+    return () => {
+      ignorar = true;
+    };
+  }, [id]);
 
+  const estado = resultado.id === id ? resultado : { tipo: 'carregando' };
+
+  if (estado.tipo === 'carregando') return <p role="status" className="mensagem">Carregando...</p>;
+  if (estado.tipo === 'erro') return <p role="alert" className="mensagem">{estado.mensagem}</p>;
+
+  const { filme } = estado;
   return (
     <div className="movie-page">
-      {movie && (
-        <>
-          <MovieCard movie={movie} showLink={false} />
-          <p className="tagline">{movie.tagline}</p>
-          <div className="info">
-            <h3>
-              <BsWallet2 /> Orçamento:
-            </h3>
-            <p>{formatCurrency(movie.budget)}</p>
-          </div>
-          <div className="info">
-            <h3>
-              <BsGraphUp /> Receita:
-            </h3>
-            <p>{formatCurrency(movie.revenue)}</p>
-          </div>
-          <div className="info">
-            <h3>
-              <BsHourglassSplit /> Duração:
-            </h3>
-            <p>{movie.runtime} minutos</p>
-          </div>
-          <div className="info description">
-            <h3>
-              <BsFillFileEarmarkTextFill /> Descrição:
-            </h3>
-            <p>{movie.overview}</p>
-          </div>
-        </>
-      )}
+      <MovieCard movie={filme} showLink={false} />
+      {filme.tagline && <p className="tagline">{filme.tagline}</p>}
+      <div className="info">
+        <h3>
+          <BsWallet2 aria-hidden="true" /> Orçamento:
+        </h3>
+        <p>{valor(filme.budget)}</p>
+      </div>
+      <div className="info">
+        <h3>
+          <BsGraphUp aria-hidden="true" /> Receita:
+        </h3>
+        <p>{valor(filme.revenue)}</p>
+      </div>
+      <div className="info">
+        <h3>
+          <BsHourglassSplit aria-hidden="true" /> Duração:
+        </h3>
+        <p>{filme.runtime ? `${filme.runtime} minutos` : 'Não informada'}</p>
+      </div>
+      <div className="info description">
+        <h3>
+          <BsFillFileEarmarkTextFill aria-hidden="true" /> Descrição:
+        </h3>
+        <p>{filme.overview || 'Sem descrição em português.'}</p>
+      </div>
     </div>
   );
-};
-
-export default Movie;
+}

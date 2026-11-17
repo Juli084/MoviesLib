@@ -1,16 +1,16 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { BrowserRouter, Routes, Route } from 'react-router';
 
-import App from "./App";
-import Home from "./pages/Home";
-import Movie from "./pages/Movie";
-import Search from "./pages/Search";
+import App from './App';
+import Home from './pages/Home';
+import Movie from './pages/Movie';
+import Search from './pages/Search';
 
-import "./index.css";
+import './index.css';
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
     <BrowserRouter>
       <Routes>
         <Route element={<App />}>
@@ -20,5 +20,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         </Route>
       </Routes>
     </BrowserRouter>
-  </React.StrictMode>,
+  </StrictMode>,
 );
