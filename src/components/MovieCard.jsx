@@ -1,20 +1,20 @@
-import { Link } from "react-router-dom";
+import { Link } from 'react-router';
+import { FaStar } from 'react-icons/fa';
+import { POSTER } from '../servicos/filmes';
 
-import { FaStar } from "react-icons/fa";
-
-const imagesURL = import.meta.env.VITE_IMG;
-
-const MovieCard = ({ movie, showLink = true }) => {
+export default function MovieCard({ movie, showLink = true }) {
   return (
     <div className="movie-card">
-      <img src={imagesURL + movie.poster_path} alt={movie.title} />
+      {movie.poster_path ? (
+        <img src={POSTER + movie.poster_path} alt={`Pôster de ${movie.title}`} loading="lazy" />
+      ) : (
+        <div className="sem-poster">Sem pôster</div>
+      )}
       <h2>{movie.title}</h2>
       <p>
-        <FaStar /> {movie.vote_average}
+        <FaStar aria-hidden="true" /> {movie.vote_average?.toFixed(1) ?? '-'}
       </p>
       {showLink && <Link to={`/movie/${movie.id}`}>Detalhes</Link>}
     </div>
   );
-};
-
-export default MovieCard;
+}

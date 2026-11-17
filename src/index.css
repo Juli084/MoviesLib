@@ -19,3 +19,36 @@ a {
 a:hover {
     color: #b8930c;
 }
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.mensagem {
+    text-align: center;
+    margin: 2rem auto;
+}
+
+.sem-poster {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 2 / 3;
+    width: 100%;
+    background-color: #1f1f1f;
+    color: #999;
+}
+
+.rodape {
+    text-align: center;
+    font-size: 0.8rem;
+    padding: 2rem 1rem;
+    color: #bbb;
+}
